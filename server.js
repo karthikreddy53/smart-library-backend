@@ -93,17 +93,19 @@ function getSessionToken(req) {
 
 function setSessionCookie(res, token) {
   const secure = process.env.NODE_ENV === "production" ? "; Secure" : "";
+  const sameSite = process.env.NODE_ENV === "production" ? "None" : "Strict";
   res.setHeader(
     "Set-Cookie",
-    `${sessionCookieName}=${token}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${sessionDurationSeconds}${secure}`,
+    `${sessionCookieName}=${token}; Path=/; HttpOnly; SameSite=${sameSite}; Max-Age=${sessionDurationSeconds}${secure}`,
   );
 }
 
 function clearSessionCookie(res) {
   const secure = process.env.NODE_ENV === "production" ? "; Secure" : "";
+  const sameSite = process.env.NODE_ENV === "production" ? "None" : "Strict";
   res.setHeader(
     "Set-Cookie",
-    `${sessionCookieName}=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0${secure}`,
+    `${sessionCookieName}=; Path=/; HttpOnly; SameSite=${sameSite}; Max-Age=0${secure}`,
   );
 }
 

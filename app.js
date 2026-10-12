@@ -13,6 +13,11 @@ const loanDue = document.querySelector("#loan-due");
 const loginForm = document.querySelector("#login-form");
 const loginView = document.querySelector("#login-view");
 const libraryApp = document.querySelector("#library-app");
+const apiBaseUrl = (window.LIBRARY_API_URL || "").replace(/\/+$/, "");
+
+function apiUrl(path) {
+  return `${apiBaseUrl}${path}`;
+}
 
 let editingBookId = null;
 let editingMemberId = null;
@@ -50,7 +55,7 @@ loginForm.addEventListener("submit", async (event) => {
 
   const credentials = Object.fromEntries(new FormData(loginForm).entries());
   try {
-    const response = await fetch("/api/login", {
+    const response = await fetch(apiUrl("/api/login"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(credentials),
@@ -76,7 +81,7 @@ loginForm.addEventListener("submit", async (event) => {
 async function request(url, options) {
   let response;
   try {
-    response = await fetch(url, { ...options, credentials: "include" });
+    response = await fetch(apiUrl(url), { ...options, credentials: "include" });
   } catch {
     throw new Error("Cannot reach the server. Check your connection and refresh.");
   }
@@ -477,7 +482,10 @@ document.querySelector("#refresh-button").addEventListener("click", () => {
 
 document.querySelector("#logout-button").addEventListener("click", async () => {
   try {
-    const response = await fetch("/api/logout", { method: "POST" });
+    const response = await fetch(apiUrl("/api/logout"), {
+      method: "POST",
+      credentials: "include",
+    });
     if (!response.ok) throw new Error(`Sign out failed (${response.status}).`);
     showLogin();
   } catch (error) {

@@ -11,6 +11,8 @@ services:
         value: production
       - key: DATA_DIR
         value: /tmp/library-data
+      - key: TRUST_PROXY
+        value: "1"
       - key: FRONTEND_URL
         sync: false
       - key: LIBRARY_ADMIN_USERNAME

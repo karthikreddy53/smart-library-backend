@@ -13,29 +13,23 @@ Copy-Item .env.example .env
 npm start
 ```
 
-Before starting, set `LIBRARY_ADMIN_USERNAME`, a unique
-`LIBRARY_ADMIN_PASSWORD` of at least 12 characters, a random `SESSION_SECRET`
-of at least 32 characters, and `FRONTEND_URL`. Do not use `admin123` on a
-publicly reachable server. Keep `.env` private.
+Set `LIBRARY_ADMIN_USERNAME`, a unique `LIBRARY_ADMIN_PASSWORD` of at least
+12 characters, and a random `SESSION_SECRET` of at least 32 characters in
+`.env`. Keep `.env` private. The database is created in `data/` by default.
+The server serves the frontend files included in this repository.
 
-The deployment repository includes the static frontend files beside
-`server.js`. In the original combined checkout, the server instead serves the
-sibling `../frontend/` directory. If neither frontend copy exists, `/` reports
-API status and `/login` redirects to `FRONTEND_URL`.
+## Deploy on Render
 
-## Deploy the complete app on Railway
+Create a new Blueprint from this repository and select `render.yaml`. Render
+will install the production dependencies, start the web service, and generate
+a random `SESSION_SECRET`. Set `FRONTEND_URL` to the exact Vercel deployment
+origin (without a trailing slash), and set a unique administrator username
+and password in the service environment. Do not use `admin123`.
 
-Import `karthikreddy53/smart-library-backend` in Railway. Railway detects
-`package.json` and runs `npm start`. Configure `LIBRARY_ADMIN_USERNAME`, a
-unique `LIBRARY_ADMIN_PASSWORD` (at least 12 characters), and `SESSION_SECRET`
-(at least 32 random characters). Set `DATA_DIR` to a Railway Volume mount path
-to retain SQLite data. Do not use `admin123` or real student records.
-
-The bundled frontend and API use one origin, so the app does not require a
-second Vercel project. Generate a Railway public domain for the web service;
-the final site opens at that domain. For a separate Vercel frontend, set
-`FRONTEND_URL` to its exact origin and update its `vercel.json` rewrite to the
-Railway backend URL.
+The included free service stores SQLite data under `/tmp`, which is
+ephemeral. Records may be lost when the service restarts or redeploys. Use
+sample data only unless you configure a persistent disk on a plan that
+supports one.
 
 ## API
 
@@ -45,6 +39,8 @@ Railway backend URL.
 - `GET /api/session` — verify the current session
 - Books, members, loans, and circulation endpoints require a valid session.
 
-The server allows credentialed requests only from `FRONTEND_URL` and local
-development origins. Admin sessions expire after eight hours. Login attempts
-are rate-limited.
+The API permits credentialed cross-origin requests from the configured
+`FRONTEND_URL` and local development origins. Production session cookies use
+`Secure` and `SameSite=None` so the Vercel frontend can authenticate to the
+Render API. Admin sessions expire after eight hours, and login attempts are
+rate-limited.
