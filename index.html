@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f3f6f4">
+  <meta name="description" content="Manage a library catalog, members, checkouts, and returns.">
+  <title>Smart Library Management System</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main id="login-view" class="login-layout" hidden>
+    <section class="panel login-panel" aria-labelledby="login-heading">
+      <p class="eyebrow">Smart Library Management</p>
+      <h1 id="login-heading">Admin sign in</h1>
+      <p class="subtitle">Sign in to manage your collection and library records.</p>
+      <form id="login-form" class="login-form">
+        <label>Username<input name="username" required maxlength="128" autocomplete="username" autofocus></label>
+        <label>Password<input name="password" type="password" required maxlength="1024" autocomplete="current-password"></label>
+        <button id="login-submit" class="button" type="submit">Sign in</button>
+      </form>
+      <p id="login-message" class="message" role="status" aria-live="polite"></p>
+    </section>
+  </main>
+  <main id="library-app" class="page" hidden>
+    <header class="page-header">
+      <div>
+        <p class="eyebrow">Smart Library Management</p>
+        <h1>Library desk</h1>
+        <p class="subtitle">Manage your collection, members, and book circulation.</p>
+      </div>
+      <div class="header-actions">
+        <button id="refresh-button" class="button button-secondary" type="button">Refresh data</button>
+        <button id="logout-button" class="button button-secondary" type="button">Sign out</button>
+      </div>
+    </header>
+
+    <section class="stats-grid" aria-label="Library summary">
+      <article class="stat-card"><span>Books in catalog</span><strong id="stat-books">—</strong></article>
+      <article class="stat-card"><span>Available now</span><strong id="stat-available">—</strong></article>
+      <article class="stat-card"><span>Members</span><strong id="stat-members">—</strong></article>
+      <article class="stat-card"><span>Checked out</span><strong id="stat-loans">—</strong></article>
+      <article class="stat-card stat-overdue"><span>Overdue</span><strong id="stat-overdue">—</strong></article>
+    </section>
+
+    <nav class="tabs" aria-label="Library sections">
+      <button class="tab-button active" type="button" data-view="books-view" aria-selected="true">Books</button>
+      <button class="tab-button" type="button" data-view="members-view" aria-selected="false">Members</button>
+      <button class="tab-button" type="button" data-view="loans-view" aria-selected="false">Loans &amp; returns</button>
+    </nav>
+
+    <section id="books-view" class="view">
+      <section class="panel" aria-labelledby="book-form-heading">
+        <h2 id="book-form-heading">Add a book</h2>
+        <form id="book-form" class="form-grid">
+          <label>Title<input name="title" required maxlength="255" autocomplete="off"></label>
+          <label>Author<input name="author" required maxlength="255" autocomplete="off"></label>
+          <label>ISBN <span class="optional">(optional)</span><input name="isbn" maxlength="32" autocomplete="off"></label>
+          <label>Category <span class="optional">(optional)</span><input name="category" maxlength="100" autocomplete="off"></label>
+          <label>Shelf location <span class="optional">(optional)</span><input name="shelf_location" maxlength="80" autocomplete="off"></label>
+          <label>Publication year <span class="optional">(optional)</span><input name="published_year" type="number" min="1000" max="2100" inputmode="numeric"></label>
+          <div class="form-actions">
+            <button id="book-submit" class="button" type="submit">Add book</button>
+            <button id="book-cancel" class="button button-secondary" type="button" hidden>Cancel edit</button>
+          </div>
+        </form>
+        <p id="book-form-message" class="message" role="status" aria-live="polite"></p>
+      </section>
+
+      <section class="panel" aria-labelledby="book-catalog-heading">
+        <div class="section-heading">
+          <h2 id="book-catalog-heading">Book catalog</h2>
+          <label class="search-label"><span class="visually-hidden">Search books</span><input id="book-search" type="search" placeholder="Search title, author, ISBN, category"></label>
+        </div>
+        <p id="book-message" class="message" role="status" aria-live="polite"></p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Title</th><th>Author</th><th>Category</th><th>ISBN</th><th>Shelf</th><th>Year</th><th>Availability</th><th>Actions</th></tr></thead>
+            <tbody id="book-list"></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+
+    <section id="members-view" class="view" hidden>
+      <section class="panel" aria-labelledby="member-form-heading">
+        <h2 id="member-form-heading">Register a member</h2>
+        <form id="member-form" class="form-grid member-form">
+          <label>Full name<input name="name" required maxlength="160" autocomplete="name"></label>
+          <label>Email<input name="email" type="email" required maxlength="254" autocomplete="email"></label>
+          <label>Phone <span class="optional">(optional)</span><input name="phone" type="tel" maxlength="40" autocomplete="tel"></label>
+          <div class="form-actions">
+            <button id="member-submit" class="button" type="submit">Add member</button>
+            <button id="member-cancel" class="button button-secondary" type="button" hidden>Cancel edit</button>
+          </div>
+        </form>
+        <p id="member-form-message" class="message" role="status" aria-live="polite"></p>
+      </section>
+
+      <section class="panel" aria-labelledby="member-list-heading">
+        <div class="section-heading">
+          <h2 id="member-list-heading">Members</h2>
+          <label class="search-label"><span class="visually-hidden">Search members</span><input id="member-search" type="search" placeholder="Search name, email, or phone"></label>
+        </div>
+        <p id="member-message" class="message" role="status" aria-live="polite"></p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Active loans</th><th>Actions</th></tr></thead>
+            <tbody id="member-list"></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+
+    <section id="loans-view" class="view" hidden>
+      <section class="panel" aria-labelledby="loan-form-heading">
+        <h2 id="loan-form-heading">Check out a book</h2>
+        <form id="loan-form" class="form-grid loan-form">
+          <label>Book<select name="book_id" id="loan-book" required></select></label>
+          <label>Member<select name="member_id" id="loan-member" required></select></label>
+          <label>Due date<input name="due_at" id="loan-due" type="date" required></label>
+          <div class="form-actions"><button class="button" type="submit">Check out</button></div>
+        </form>
+        <p class="help-text">Only available books can be checked out. The default loan period is 14 days.</p>
+        <p id="loan-form-message" class="message" role="status" aria-live="polite"></p>
+      </section>
+
+      <section class="panel" aria-labelledby="loan-list-heading">
+        <div class="section-heading">
+          <h2 id="loan-list-heading">Loans</h2>
+          <label class="filter-label">Show
+            <select id="loan-filter">
+              <option value="all">All loans</option>
+              <option value="active">Due / active</option>
+              <option value="overdue">Overdue</option>
+              <option value="returned">Returned</option>
+            </select>
+          </label>
+        </div>
+        <p id="loan-message" class="message" role="status" aria-live="polite"></p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Book</th><th>Member</th><th>Checked out</th><th>Due date</th><th>Returned</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody id="loan-list"></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+    <footer class="footer">Library records are stored in the local SQLite database.</footer>
+  </main>
+  <script src="app.js" defer></script>
+</body>
+</html>

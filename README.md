@@ -18,22 +18,24 @@ Before starting, set `LIBRARY_ADMIN_USERNAME`, a unique
 of at least 32 characters, and `FRONTEND_URL`. Do not use `admin123` on a
 publicly reachable server. Keep `.env` private.
 
-For a combined local checkout, the server serves the sibling `frontend/` files
-when they exist. Otherwise, `/` reports API status and `/login` redirects to
-`FRONTEND_URL`.
+The deployment repository includes the static frontend files beside
+`server.js`. In the original combined checkout, the server instead serves the
+sibling `../frontend/` directory. If neither frontend copy exists, `/` reports
+API status and `/login` redirects to `FRONTEND_URL`.
 
-## Deploy on Render
+## Deploy the complete app on Railway
 
-Create a Blueprint from this repository and select this folder/repository as the
-root. Render reads `render.yaml`; provide the exact Vercel frontend origin for
-`FRONTEND_URL`, choose an admin username, and set a unique strong admin
-password. Render generates `SESSION_SECRET`. The service URL used by the
-frontend rewrite is `https://smart-library-backend.onrender.com`.
+Import `karthikreddy53/smart-library-backend` in Railway. Railway detects
+`package.json` and runs `npm start`. Configure `LIBRARY_ADMIN_USERNAME`, a
+unique `LIBRARY_ADMIN_PASSWORD` (at least 12 characters), and `SESSION_SECRET`
+(at least 32 random characters). Set `DATA_DIR` to a Railway Volume mount path
+to retain SQLite data. Do not use `admin123` or real student records.
 
-The free Render service uses `/tmp` for SQLite data. Its local database is
-ephemeral and can be cleared when the service restarts or redeploys. Use only
-sample data on this free demo; choose persistent storage or a managed database
-before storing real library records.
+The bundled frontend and API use one origin, so the app does not require a
+second Vercel project. Generate a Railway public domain for the web service;
+the final site opens at that domain. For a separate Vercel frontend, set
+`FRONTEND_URL` to its exact origin and update its `vercel.json` rewrite to the
+Railway backend URL.
 
 ## API
 

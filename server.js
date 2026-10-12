@@ -8,7 +8,11 @@ const cors = require("cors");
 const app = express();
 const port = Number(process.env.PORT || 3000);
 const host = process.env.HOST || "0.0.0.0";
-const frontendRoot = path.resolve(__dirname, "..", "frontend");
+const bundledFrontendRoot = __dirname;
+const siblingFrontendRoot = path.resolve(__dirname, "..", "frontend");
+const frontendRoot = existsSync(path.join(bundledFrontendRoot, "index.html"))
+  ? bundledFrontendRoot
+  : siblingFrontendRoot;
 const frontendUrl = (process.env.FRONTEND_URL || "http://localhost:3000").replace(/\/+$/, "");
 const allowedOrigins = new Set([
   frontendUrl,
@@ -273,7 +277,9 @@ app.use(cors({
   credentials: true,
 }));
 app.use((req, res, next) => {
-  if (req.headers.origin && !allowedOrigins.has(req.headers.origin)) {
+  const origin = req.headers.origin;
+  const sameOrigin = origin === `${req.protocol}://${req.get("host")}`;
+  if (origin && !sameOrigin && !allowedOrigins.has(origin)) {
     return res.status(403).json({ error: "Requests from this origin are not allowed." });
   }
   next();
