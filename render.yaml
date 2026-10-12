@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: smart-library-backend
+    runtime: node
+    plan: free
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATA_DIR
+        value: /tmp/library-data
+      - key: FRONTEND_URL
+        sync: false
+      - key: LIBRARY_ADMIN_USERNAME
+        sync: false
+      - key: LIBRARY_ADMIN_PASSWORD
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true
